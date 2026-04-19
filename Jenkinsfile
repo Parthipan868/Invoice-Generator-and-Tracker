@@ -7,12 +7,6 @@ pipeline {
 
     stages {
 
-        stage('Clone Repo') {
-            steps {
-                git 'https://github.com/Parthipan868/Invoice-Generator-and-Tracker.git'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {
@@ -28,7 +22,7 @@ pipeline {
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
                 )]) {
-                    sh 'echo $PASS | docker login -u $USER --password-stdin'
+                    bat 'echo %PASS% | docker login -u %USER% --password-stdin'
                 }
             }
         }
@@ -43,10 +37,10 @@ pipeline {
 
         stage('Deploy Container') {
             steps {
-                sh '''
-                docker stop invoice-container || true
-                docker rm invoice-container || true
-                docker run -d -p 3000:80 --name invoice-container ${IMAGE}:latest
+                bat '''
+                docker stop invoice-container || exit 0
+                docker rm invoice-container || exit 0
+                docker run -d -p 3000:80 --name invoice-container %IMAGE%:latest
                 '''
             }
         }
